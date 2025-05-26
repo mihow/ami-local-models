@@ -1,0 +1,147 @@
+[tool.poetry]
+name = "resnet50-tflite-converter"
+version = "0.1.0"
+description = "Convert ResNet50 TIMM models to TFLite format and compare inference results"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+# Core ML libraries - Latest 2025 versions
+numpy = ">=1.24.0,<3.0.0"  # Now supports NumPy 2.0
+torch = ">=2.7.0,<2.8.0"  # Latest April 2025
+torchvision = ">=0.22.0,<0.23.0"  # Latest April 2025
+tensorflow = ">=2.19.0,<2.20.0"  # Latest March 2025
+timm = ">=1.0.0"  # Latest stable version
+
+# ONNX ecosystem - Latest 2025 versions
+onnx = ">=1.18.0,<1.19.0"  # Latest May 2025
+onnxruntime = ">=1.22.0,<1.23.0"  # Latest May 2025
+
+# Conversion tools (alternatives to deprecated onnx-tf)
+tf2onnx = ">=1.16.0"  # TensorFlow to ONNX
+onnx2tf = ">=1.20.0"  # ONNX to TensorFlow/TFLite
+
+# CLI and validation
+typer = ">=0.12.0"
+pydantic = ">=2.7.0"
+
+# Image processing
+pillow = ">=10.3.0"
+
+# Utilities
+tqdm = ">=4.66.0"
+requests = ">=2.31.0"
+
+[tool.poetry.group.dev.dependencies]
+# Testing
+pytest = ">=7.4.0"
+pytest-cov = ">=4.1.0"
+pytest-mock = ">=3.11.0"
+
+# Code formatting and linting
+black = ">=23.7.0"
+isort = ">=5.12.0"
+flake8 = ">=6.0.0"
+mypy = ">=1.5.0"
+
+# Jupyter for experimentation
+jupyter = ">=1.0.0"
+ipykernel = ">=6.25.0"
+
+# Documentation
+mkdocs = ">=1.5.0"
+mkdocs-material = ">=9.2.0"
+
+[tool.poetry.scripts]
+convert-to-tflite = "src.convert_to_tflite:main"
+test-models = "src.test_models:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["src"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "onnx.*",
+    "onnx_tf.*",
+    "timm.*",
+    "tensorflow.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
